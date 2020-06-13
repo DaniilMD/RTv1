@@ -40,7 +40,7 @@ void		light_parse(t_param *param, char **line)
 
 	i = param->lights_num;
 	param->lights[i].type = ft_strdup(line[1]);
-	if (strcmp(param->lights[i].type, "ambient") == 0)
+	if (ft_strcmp(param->lights[i].type, "ambient") == 0)
 	{
 		param->lights[i].intensity = (double)ft_atoi(line[2]) / 100;
 		param->lights_num++;
@@ -57,24 +57,11 @@ void		figures_parse(t_param *param, char **line)
 
 	i = param->figures_num;
 	param->figures[i].type = ft_strdup(line[0]);
-	/*if (strcmp(param->figures[i].type, "plane:") == 0)
-	{
-		param->figures[i].center = make_vector(line[1]);
-		param->figures[i].direction = make_vector(line[2]);
-		
-	}
-	else if (strcmp(param->figures[i].type, "sphere:") == 0)
-	{
-		param->figures[i].center = make_vector(line[1]);
-		param->figures[i].direction = make_vector(line[2]);
-	}
-	else if (strcmp(param->figures[i].type, "cone:") == 0)
-	{
-		param->figures[i].center = make_vector(line[1]);
-		param->figures[i].direction = make_vector(line[2]);
-	}*/
 	param->figures[i].center = make_vector(line[1]);
 	param->figures[i].direction = make_vector(line[2]);
+	param->figures[i].direction.x = param->figures[i].direction.x * PI / 180;
+	param->figures[i].direction.y = param->figures[i].direction.y * PI / 180;
+	param->figures[i].direction.z = param->figures[i].direction.z * PI / 180;
 	param->figures[i].radius = ft_atoi(line[3]);
 	param->figures[i].colour = make_vector(line[4]);
 	param->figures[i].shine_idx = ft_atoi(line[5]);
@@ -95,9 +82,9 @@ void		parser(char *name, t_param *param)
 	while ((ret = get_next_line(fd, &line)) != 0)
 	{
 		splitted = ft_strsplit(line, ' ');
-		if (strcmp(splitted[0], "camera:") == 0)
+		if (ft_strcmp(splitted[0], "camera:") == 0)
 			camera_parse(param, splitted);
-		else if (strcmp(splitted[0], "light:") == 0)
+		else if (ft_strcmp(splitted[0], "light:") == 0)
 			light_parse(param, splitted);
 		else
 			figures_parse(param, splitted);

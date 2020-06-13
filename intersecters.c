@@ -50,48 +50,19 @@ void		intersect_sphere(t_param *param, t_vector start,
 void		intersect_plane(t_param *param, t_vector start,
 	t_vector direction, t_square_equation *sqr_eq)
 {
-	/*double	c;
-	double	t;
+	t_plane_par pl_par;
 
-	c = dot_product(&(direction), &(param->figures[sqr_eq->fig_num].direction));
-	if (c == 0)
-	{
-		sqr_eq->t1 = INF;
-		sqr_eq->t2 = INF;
-		return ;
-	}
-	t = (param->figures[sqr_eq->fig_num].radius - dot_product(&(start),
-	&(param->figures[sqr_eq->fig_num].direction))) / c;
-	if (t < 0)
-	{
-		sqr_eq->t1 = INF;
-		sqr_eq->t2 = INF;
-		return ;
-	}
-	sqr_eq->t1 = t;
-	sqr_eq->t2 = t;
-	return ;*/
-	double A;
-	double B;
-	double C;
-	double D;
-	double m;
-	double n;
-	double p;
-	double x1;
-	double y1;
-	double z1;
-	A = param->figures[sqr_eq->fig_num].direction.x;
-	B = param->figures[sqr_eq->fig_num].direction.y;
-	C = param->figures[sqr_eq->fig_num].direction.z;
-	D = param->figures[sqr_eq->fig_num].radius;
-	x1 = start.x;
-	y1 = start.y;
-	z1 = start.z;
-	m = direction.x;
-	n = direction.y;
-	p = direction.z;
-	if (A * m + B * n + C * p == 0)
+	pl_par.a = param->figures[sqr_eq->fig_num].center.x;
+	pl_par.b = param->figures[sqr_eq->fig_num].center.y;
+	pl_par.c = param->figures[sqr_eq->fig_num].center.z;
+	pl_par.d = param->figures[sqr_eq->fig_num].radius;
+	pl_par.x1 = start.x;
+	pl_par.y1 = start.y;
+	pl_par.z1 = start.z;
+	pl_par.m = direction.x;
+	pl_par.n = direction.y;
+	pl_par.p = direction.z;
+	if (pl_par.a * pl_par.m + pl_par.b * pl_par.n + pl_par.c * pl_par.p == 0)
 	{
 		sqr_eq->t1 = INF;
 		sqr_eq->t2 = INF;
@@ -99,60 +70,61 @@ void		intersect_plane(t_param *param, t_vector start,
 	}
 	else
 	{
-		sqr_eq->t1 = -(A * x1 + B * y1 + C * z1 + D) / (A * m + B * n + C * p);
+		sqr_eq->t1 = -(pl_par.a * pl_par.x1 + pl_par.b * pl_par.y1
+		+ pl_par.c * pl_par.z1 + pl_par.d) / (pl_par.a * pl_par.m
+		+ pl_par.b * pl_par.n + pl_par.c * pl_par.p);
+		sqr_eq->t2 = sqr_eq->t1;
 	}
+}
+
+void		intersect_cylinder(t_param *param, t_vector start,
+	t_vector direction, t_square_equation *sqr_eq)
+{
+	t_cylinder_par cyl_par;
+
+	start = vec_substr(&start, &(param->figures[sqr_eq->fig_num].center));
+	start = rotate_vector(start, param->figures[sqr_eq->fig_num].direction, -1);
+	direction = rotate_vector(direction,
+		param->figures[sqr_eq->fig_num].direction, -1);
+	cyl_par.r = param->figures[sqr_eq->fig_num].radius;
+	cyl_par.x1 = start.x;
+	cyl_par.y1 = start.y;
+	cyl_par.z1 = start.z;
+	cyl_par.l = direction.x;
+	cyl_par.m = direction.y;
+	cyl_par.n = direction.z;
+	sqr_eq->k1 = (cyl_par.l * cyl_par.l + cyl_par.n * cyl_par.n);
+	sqr_eq->k2 = 2 * (cyl_par.l * cyl_par.x1 + cyl_par.n * cyl_par.z1);
+	sqr_eq->k3 = (cyl_par.x1 * cyl_par.x1 +
+		cyl_par.z1 * cyl_par.z1 - cyl_par.r * cyl_par.r);
+	sqr_eq->discr = sqr_eq->k2 * sqr_eq->k2 - 4 * sqr_eq->k1 * sqr_eq->k3;
+	count_roots(sqr_eq);
 }
 
 void		intersect_cone(t_param *param, t_vector start,
 	t_vector direction, t_square_equation *sqr_eq)
 {
+	t_cone_par cone_par;
 
-
-
-}
-
-
-
-void		intersect_cylinder(t_param *param, t_vector start,
-	t_vector direction, t_square_equation *sqr_eq)
-{
-	double A;
-	double B;
-	double l;
-	double m;
-	double n;
-	double x1;
-	double y1;
-	double z1;
-	t_vector help;
-	help.x = 90 * PI / 180;
-	help.y = 0;
-	help.z = 0;
-	start = rotate_vector(start, param->figures[sqr_eq->fig_num].direction);
-	direction = rotate_vector(direction, param->figures[sqr_eq->fig_num].direction);
-	start = rotate_vector(start, help);
-	direction = rotate_vector(direction, help);
-	A = param->figures[sqr_eq->fig_num].radius;//center.x;
-	B = param->figures[sqr_eq->fig_num].radius;//center.y;
-	x1 = start.x;
-	y1 = start.y;
-	z1 = start.z;
-	l = direction.x;
-	m = direction.y;
-	n = direction.z;
-	sqr_eq->k1 = (B * B * l * l + A * A * m * m);
-	sqr_eq->k2 = 2 * (B * B * l * x1 + A * A * m * y1);
-	sqr_eq->k3 = (B * B * x1 * x1 + A * A * y1 * y1 - A * A * B * B);
+	start = vec_substr(&start, &(param->figures[sqr_eq->fig_num].center));
+	start = rotate_vector(start, param->figures[sqr_eq->fig_num].direction, -1);
+	direction = rotate_vector(direction,
+		param->figures[sqr_eq->fig_num].direction, -1);
+	cone_par.h_big = INF;
+	cone_par.s = tan(param->figures[sqr_eq->fig_num].radius * PI / 180)
+		* cone_par.h_big;
+	cone_par.x1 = start.x;
+	cone_par.y1 = start.y;
+	cone_par.z1 = start.z;
+	cone_par.l = direction.x;
+	cone_par.m = direction.y;
+	cone_par.n = direction.z;
+	sqr_eq->k1 = (cone_par.n * cone_par.n * cone_par.h_big + cone_par.l
+	* cone_par.l * cone_par.h_big - cone_par.m * cone_par.m * cone_par.s);
+	sqr_eq->k2 = 2 * (cone_par.x1 * cone_par.l * cone_par.h_big + cone_par.z1
+	* cone_par.n * cone_par.h_big - cone_par.y1 * cone_par.m * cone_par.s);
+	sqr_eq->k3 = (cone_par.x1 * cone_par.x1 * cone_par.h_big + cone_par.z1
+	* cone_par.z1 * cone_par.h_big - cone_par.y1 * cone_par.y1 * cone_par.s);
 	sqr_eq->discr = sqr_eq->k2 * sqr_eq->k2 - 4 * sqr_eq->k1 * sqr_eq->k3;
-	if (sqr_eq->discr > 0)
-	{
-		//printf("sss)))\n");
-		sqr_eq->t1 = (0 - sqr_eq->k2 + sqrt(sqr_eq->discr)) / (2 * sqr_eq->k1);
-		sqr_eq->t2 = (0 - sqr_eq->k2 - sqrt(sqr_eq->discr)) / (2 * sqr_eq->k1);
-		//printf("%f %f\n", sqr_eq->t1, sqr_eq->t2);
-		return ;
-	}
-	//printf("wefweergergreg)))\n");
-	sqr_eq->t1 = INF;
-	sqr_eq->t2 = INF;
+	count_roots(sqr_eq);
 }

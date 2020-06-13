@@ -18,58 +18,37 @@ t_vector		reflect_ray(t_vector vec1, t_vector vec2)
 
 	res = mult_vector_on_constant(vec2, 2 * dot_product(&vec2, &vec1));
 	res = vec_substr(&res, &vec1);
-    return (res);
+	return (res);
 }
 
 t_vector		trace_ray(t_param *param, t_vector start,
 	t_vector direction)
 {
 	t_inter_res			inter_res;
+	t_trace_ray_par		trp;
 
-
-	t_vector			local_colour;
-	t_vector			reflected_colour;
-	t_vector			normal;
-	t_vector			p_big;
-	t_vector			r_big;
-
-
-	inter_res = look_for_intersections(param, start, direction);
 	param->lighting_intensity = 0;
+	inter_res = look_for_intersections(param, start, direction);
 	if (inter_res.closest_figure != NO_INTERSECTIONS)
 		compute_lighting(param, &inter_res);
-	local_colour = set_curr_colour(param, &inter_res);
-	////////////////////////////////////////////////////////////
-	//return (local_colour);
-
-	//local_colour = param->curr_colour;
-	if ((param->recur_depth <= 0) || (param->figures[inter_res.closest_figure].reflective <= 0))
-		return (local_colour);
-
-
-	p_big =  vec_sum(start,
+	trp.local_colour = set_curr_colour(param, &inter_res);
+	if ((param->recur_depth-- <= 0) ||
+		(param->figures[inter_res.closest_figure].reflective <= 0))
+		return (trp.local_colour);
+	trp.p_big = vec_sum(start,
 		mult_vector_on_constant(direction, inter_res.closest_t));
-
-	normal = vec_substr(&p_big, &(param->figures[inter_res.closest_figure].center));
-	normal = mult_vector_on_constant(normal, 1 / get_vector_length(&normal));
-
+	trp.normal = vec_substr(&(trp.p_big),
+		&(param->figures[inter_res.closest_figure].center));
+	trp.normal = mult_vector_on_constant(trp.normal,
+		1 / get_vector_length(&(trp.normal)));
 	param->t_max_min.t_max = INF;
 	param->t_max_min.t_min = 0.001;
-	param->recur_depth--;
-
-	r_big = reflect_ray(mult_vector_on_constant(direction, -1), normal);
-
-	reflected_colour = trace_ray(param, p_big, r_big);
-
-	//param->t_max_min.t_max = INF;
-	//		param->t_max_min.t_min = 1;
-
-
-	return (vec_sum(mult_vector_on_constant(local_colour,
+	trp.r_big = reflect_ray(mult_vector_on_constant(direction, -1), trp.normal);
+	trp.reflected_colour = trace_ray(param, trp.p_big, trp.r_big);
+	return (vec_sum(mult_vector_on_constant(trp.local_colour,
 	(1 - param->figures[inter_res.closest_figure].reflective)),
-	mult_vector_on_constant(reflected_colour,
+	mult_vector_on_constant(trp.reflected_colour,
 	param->figures[inter_res.closest_figure].reflective)));
-	/////////////////////////////////////////////////////////////////////////
 }
 
 t_inter_res		look_for_intersections(t_param *param, t_vector start,
@@ -94,7 +73,7 @@ t_inter_res		look_for_intersections(t_param *param, t_vector start,
 	return (inter_res);
 }
 
-void		set_closest_fig_and_t(t_param *param,
+void			set_closest_fig_and_t(t_param *param,
 	t_square_equation *sqr_eq, int i, t_inter_res *inter_res)
 {
 	if ((sqr_eq->t1 > param->t_max_min.t_min) && (sqr_eq->t1 <
@@ -127,5 +106,25 @@ t_vector		set_curr_colour(t_param *param, t_inter_res *inter_res)
 		colour.y = 255;
 	if (colour.z > 255)
 		colour.z = 255;
+
+
+	// if (colour.x > 255 || colour.y > 255 || colour.x > 255)
+	// {
+	// 	colour.z = 255;
+	// 	colour.y = 255;
+	// 	colour.x = 255;
+	// }
+
+
+
+	// if (param->lighting_intensity > 1)
+	// {
+	// 	colour.z = 255;
+	// 	colour.y = 255;
+	// 	colour.x = 255;
+	// }
+
+
+
 	return (colour);
 }

@@ -93,5 +93,6 @@ t_list				*ft_list_find(t_list *begin_list,
 void				ft_list_merge(t_list **begin_list1, t_list *begin_list2);
 void				ft_list_sort(t_list **begin_list, int (*cmp)());
 int					get_next_line(const int fd, char **line);
+void				free_char_starstar(char **splitted);
 
 #endif

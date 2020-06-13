@@ -13,21 +13,21 @@
 NAME = RTv1
 
 SRC = main.c parser.c vector_operations.c trace_ray.c intersecters.c lighting.c \
-	help_functions.c
+	help_functions.c validator.c validator_helpers.c
 
 OBJ = $(SRC:.c=.o)
 
 HEADER = rtv1.h
 
-##FLAGS = -Wall -Wextra -Werror
+FLAGS = -Wall -Wextra -Werror
 
-FLAGS =  
+MLX_FLAGS = -L ./mlx/ -lmlx -lmlx -lXext -lX11
 
-MLX_FLAGS = -L ./mlx/ -lmlx -framework OpenGL -framework AppKit
+# MLX_FLAGS = -L ./mlx/ -lmlx -framework OpenGL -framework AppKit
 
 $(NAME): $(OBJ)
 	@make -C libft/
-	@gcc $(FLAGS) $(SRC) -o $(NAME) -L libft -lft $(MLX_FLAGS)
+	@gcc $(FLAGS) $(SRC) -o $(NAME) -L libft -lft $(MLX_FLAGS) -lm -pthread
 
 %.o:%.c $(HEADER)
 	@gcc $(FLAGS) -I . -c $< -o $@
@@ -45,4 +45,8 @@ all: $(NAME)
 
 re: fclean all
 
-.PHONY: clean fclean all re
+makecl:
+	make
+	make clean
+
+.PHONY: clean fclean all re makecl
