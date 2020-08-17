@@ -1,15 +1,3 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: openelop <marvin@42.fr>                    +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2019/12/31 13:23:41 by openelop          #+#    #+#              #
-#    Updated: 2019/12/31 13:23:45 by openelop         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
 NAME = RTv1
 
 SRC = main.c parser.c vector_operations.c trace_ray.c intersecters.c lighting.c \
@@ -21,13 +9,15 @@ HEADER = rtv1.h
 
 FLAGS = -Wall -Wextra -Werror
 
-MLX_FLAGS = -L ./mlx/ -lmlx -lmlx -lXext -lX11
+MLX_FLAGS = -L ./minilibx -lmlx -lXext -lX11
+#MLX_FLAGS_MacOS = -L ./mlx/ -lmlx -framework OpenGL -framework AppKit 
 
-# MLX_FLAGS = -L ./mlx/ -lmlx -framework OpenGL -framework AppKit
+LINUX_EXTRA_FLAGS = -lm -pthread
+
 
 $(NAME): $(OBJ)
 	@make -C libft/
-	@gcc $(FLAGS) $(SRC) -o $(NAME) -L libft -lft $(MLX_FLAGS) -lm -pthread
+	@gcc $(FLAGS) $(SRC) -o $(NAME) -L libft -lft $(MLX_FLAGS) $(LINUX_EXTRA_FLAGS)
 
 %.o:%.c $(HEADER)
 	@gcc $(FLAGS) -I . -c $< -o $@

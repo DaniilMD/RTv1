@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   rtv1.h                                             :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: openelop <marvin@42.fr>                    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/12/31 13:24:07 by openelop          #+#    #+#             */
-/*   Updated: 2020/01/27 13:58:29 by lvania           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef RTV1_H
 # define RTV1_H
 # include "libft/libft.h"
@@ -17,19 +5,11 @@
 # include <fcntl.h>
 # include <sys/stat.h>
 # include <sys/types.h>
-
-
-
-//# include <mlx.h>
-
-
-
 # include <math.h>
 # include <pthread.h>
 
-
-
-# include </home/progerdaniil/Desktop/minilibx-master/mlx.h>
+// # include <mlx.h>
+# include "./minilibx/mlx.h"
 
 
 # define WINDOW_WIDTH 800
